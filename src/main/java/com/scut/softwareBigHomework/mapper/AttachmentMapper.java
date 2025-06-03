@@ -1,0 +1,7 @@
+package com.scut.softwareBigHomework.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface AttachmentMapper {
+}
