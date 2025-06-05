@@ -24,4 +24,9 @@ public class UserController {
         return userService.register(userDto);
     }
 
+    @PostMapping("/sms")
+    public CommonResponse sms(@RequestBody UserDto userDto) {
+        return userService.sms(userDto);
+    }
+
 }

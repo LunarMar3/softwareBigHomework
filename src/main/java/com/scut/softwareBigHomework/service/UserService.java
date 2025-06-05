@@ -7,4 +7,6 @@ public interface UserService {
     CommonResponse login(UserDto userDto);
 
     CommonResponse register(UserDto userDto);
+
+    CommonResponse sms(UserDto userDto);
 }
