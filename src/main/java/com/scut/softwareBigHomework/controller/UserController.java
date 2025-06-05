@@ -6,7 +6,8 @@ import com.scut.softwareBigHomework.utils.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/account")
+@RestController
+@RequestMapping("/account")
 public class UserController {
 
     @Autowired
