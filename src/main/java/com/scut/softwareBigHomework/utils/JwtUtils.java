@@ -19,7 +19,7 @@ public class JwtUtils {
 
 
     // 生成 Token
-    public static String generateToken(String username) {
+    public static String generateToken(String username,Integer id) {
         // 令牌id
         String uuid = UUID.randomUUID().toString();
         Date exprireDate = Date.from(Instant.now().plusSeconds(3600));
@@ -32,6 +32,7 @@ public class JwtUtils {
                 .and()
                 // 设置自定义负载信息payload
                 .claim("username", username)
+                .claim("id",id)
                 // 令牌ID
                 .id(uuid)
                 // 过期日期
