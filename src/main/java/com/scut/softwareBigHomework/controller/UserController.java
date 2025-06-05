@@ -4,11 +4,9 @@ import com.scut.softwareBigHomework.dto.UserDto;
 import com.scut.softwareBigHomework.service.UserService;
 import com.scut.softwareBigHomework.utils.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/user")
+@RestController("/account")
 public class UserController {
 
     @Autowired
@@ -29,4 +27,8 @@ public class UserController {
         return userService.sms(userDto);
     }
 
+    @GetMapping("/getUsers")
+    public CommonResponse getUsers(@RequestParam String departmentId,@RequestParam Integer index) {
+        return userService.getUsers(index,departmentId);
+    }
 }

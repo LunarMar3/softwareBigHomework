@@ -1,6 +1,7 @@
 package com.scut.softwareBigHomework.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scut.softwareBigHomework.dto.UserDto;
 import com.scut.softwareBigHomework.entity.User;
 import com.scut.softwareBigHomework.mapper.UserMapper;
@@ -16,6 +17,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -88,6 +92,23 @@ public class UserServiceImpl implements UserService {
         // 发送邮件
         mailSender.send(message);
         return new CommonResponse(200, "发送成功", null);
+    }
+
+    @Override
+    public CommonResponse getUsers(Integer index,String departmentId) {
+        Page<User> page = new Page<>(index, 10);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("department_id", departmentId);
+        userMapper.selectPage(page, queryWrapper);
+        List<User> users = page.getRecords();
+        List<UserDto> userDtos = new ArrayList<>();
+        for (User user : users) {
+            UserDto userDto = new UserDto();
+            BeanUtils.copyProperties(user, userDto);
+            userDtos.add(userDto);
+        }
+        return CommonResponse.success(userDtos);
+
     }
 
 }

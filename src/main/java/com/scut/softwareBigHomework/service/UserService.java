@@ -9,4 +9,6 @@ public interface UserService {
     CommonResponse register(UserDto userDto);
 
     CommonResponse sms(UserDto userDto);
+
+    CommonResponse getUsers(Integer index ,String departmentId);
 }
