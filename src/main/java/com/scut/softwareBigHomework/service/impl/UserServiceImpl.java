@@ -19,6 +19,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,8 +75,8 @@ public class UserServiceImpl implements UserService {
 
         user = new User();
         BeanUtils.copyProperties(userDto, user);
-        user.setCreatedAt(new DateTime());
-        user.setUpdatedAt(new DateTime());
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
 
         userMapper.insert(user);
         return CommonResponse.success(null);

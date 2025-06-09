@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,12 +42,12 @@ public class WorkOrder {
     DateTime createdAt;
 
     @TableField("updated_at")
-    DateTime updatedAt;
+    LocalDateTime updatedAt;
 
     @TableField("completed_at")
-    DateTime completedAt;
+    LocalDateTime completedAt;
 
-    DateTime deadline;
+    LocalDateTime deadline;
 
     String solution;
 }

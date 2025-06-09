@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,9 +26,9 @@ public class Department {
     String description;
 
     @TableField("create_at")
-    DateTime createAt;
+    LocalDateTime createAt;
 
     @TableField("update_at")
-    DateTime updateAt;
+    LocalDateTime updateAt;
 
 }
