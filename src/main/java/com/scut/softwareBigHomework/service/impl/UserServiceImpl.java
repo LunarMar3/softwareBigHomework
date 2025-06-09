@@ -1,5 +1,6 @@
 package com.scut.softwareBigHomework.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scut.softwareBigHomework.dto.UserDto;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -67,9 +69,13 @@ public class UserServiceImpl implements UserService {
         if (!code.equals(userDto.getCode())) {
             return CommonResponse.fail("验证码错误");
         }
+        redisTemplate.delete("code:" + userDto.getEmail());
 
         user = new User();
         BeanUtils.copyProperties(userDto, user);
+        user.setCreatedAt(new DateTime());
+        user.setUpdatedAt(new DateTime());
+
         userMapper.insert(user);
         return CommonResponse.success(null);
     }

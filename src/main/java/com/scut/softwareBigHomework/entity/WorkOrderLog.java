@@ -24,6 +24,6 @@ public class WorkOrderLog {
 
     String details;
 
-    @TableField("create_at")
-    DateTime createAt;
+    @TableField("created_at")
+    DateTime createdAt;
 }

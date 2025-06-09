@@ -25,6 +25,6 @@ public class Attachment {
     @TableField("uploader_id")
     int uploaderId;
 
-    @TableField("create_at")
-    DateTime createAt;
+    @TableField("created_at")
+    DateTime createdAt;
 }

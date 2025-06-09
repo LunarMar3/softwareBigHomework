@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.UUID;
 
 public class JwtUtils {
-    private static final String SECRET_KEY = "Minecraft";
+    private static final String SECRET_KEY = "MinecraftTerrariaStardewValleySlayTheSpire";
 
     private final static SecureDigestAlgorithm<SecretKey,SecretKey> SHA256 = Jwts.SIG.HS256;
 

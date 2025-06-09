@@ -36,14 +36,14 @@ public class WorkOrder {
     @TableField("assignee_group_id")
     int assigneeGroupId;
 
-    @TableField("create_at")
-    DateTime createAt;
+    @TableField("created_at")
+    DateTime createdAt;
 
-    @TableField("update_at")
-    DateTime updateAt;
+    @TableField("updated_at")
+    DateTime updatedAt;
 
-    @TableField("complete_at")
-    DateTime completeAt;
+    @TableField("completed_at")
+    DateTime completedAt;
 
     DateTime deadline;
 
