@@ -11,4 +11,6 @@ public interface UserService {
     CommonResponse sms(UserDto userDto);
 
     CommonResponse getUsers(Integer index ,String departmentId);
+
+    CommonResponse logout(String token);
 }
