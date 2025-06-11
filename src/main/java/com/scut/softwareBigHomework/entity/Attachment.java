@@ -1,6 +1,5 @@
 package com.scut.softwareBigHomework.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,6 @@ public class Attachment {
 
     @TableField("work_order_id")
     int workOrderId;
-
-    String url;
 
     @TableField("file_name")
     String fileName;

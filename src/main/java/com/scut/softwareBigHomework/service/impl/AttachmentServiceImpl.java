@@ -33,8 +33,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             return CommonResponse.fail("文件上传失败");
         }
         Attachment attachment = new Attachment();
-        attachment.setUrl(filePath);
-        attachment.setFileName(originalFilename);
+        attachment.setFileName(filePath);
         attachment.setUploaderId(Integer.parseInt(JwtUtils.getId(token)));
         attachment.setWorkOrderId(workOrderId);
         attachmentMapper.insert(attachment);
