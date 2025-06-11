@@ -28,7 +28,7 @@ public class UserController {
         return userService.sms(userDto);
     }
 
-    @GetMapping("/getUsers")
+    @GetMapping("/getUsersByDepartmentId")
     public CommonResponse getUsers(@RequestParam String departmentId,@RequestParam Integer index) {
         return userService.getUsers(index,departmentId);
     }

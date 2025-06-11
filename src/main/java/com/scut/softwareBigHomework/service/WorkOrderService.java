@@ -7,4 +7,7 @@ public interface WorkOrderService {
     CommonResponse getAllWorkOrders(String token,int index);
 
     CommonResponse createWorkOrder(String token, WorkOrderDto workOrderDto);
+
+    CommonResponse updateWorkOrder(String token, WorkOrderDto workOrderDto);
+
 }

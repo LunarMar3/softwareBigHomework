@@ -1,6 +1,5 @@
 package com.scut.softwareBigHomework.controller;
 
-import com.scut.softwareBigHomework.entity.Department;
 import com.scut.softwareBigHomework.service.DepartmentService;
 import com.scut.softwareBigHomework.utils.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -21,4 +21,9 @@ public class WorkOrderController {
     public CommonResponse createWorkOrder(@RequestHeader("token") String token,@RequestBody WorkOrderDto workOrderDto) {
         return workOrderService.createWorkOrder(token,workOrderDto);
     }
+
+    @PostMapping("/updateWorkOrder")
+    public CommonResponse updateWorkOrder(@RequestHeader("token") String token,@RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.updateWorkOrder(token,workOrderDto);
+    }
 }
