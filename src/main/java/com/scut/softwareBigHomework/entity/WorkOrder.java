@@ -1,6 +1,5 @@
 package com.scut.softwareBigHomework.entity;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,7 @@ public class WorkOrder {
     int assigneeGroupId;
 
     @TableField("created_at")
-    DateTime createdAt;
+    LocalDateTime createdAt;
 
     @TableField("updated_at")
     LocalDateTime updatedAt;
