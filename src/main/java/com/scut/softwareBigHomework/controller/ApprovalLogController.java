@@ -15,7 +15,7 @@ public class ApprovalLogController {
     @Autowired
     private ApprovalLogService approvalLogService;
 
-    @GetMapping("/getApprovalLogByApprovalId")
+    @GetMapping("/getAll")
     public CommonResponse getAllApprovalLog(@RequestParam("index") Integer index) {
         return approvalLogService.getAllApprovalLog(index);
     }
