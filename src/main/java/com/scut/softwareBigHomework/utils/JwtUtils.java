@@ -63,4 +63,7 @@ public class JwtUtils {
         return parsePayload(token).getExpiration().before(new Date());
     }
 
+    public static String getId(String token) {
+        return parsePayload(token).get("id").toString();
+    }
 }

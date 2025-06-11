@@ -1,6 +1,5 @@
 package com.scut.softwareBigHomework.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scut.softwareBigHomework.dto.UserDto;
@@ -20,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -52,7 +49,10 @@ public class UserServiceImpl implements UserService {
         if (!user.getPassword().equals(userDto.getPassword())) {
             return CommonResponse.fail("密码错误");
         }
-        return CommonResponse.success(JwtUtils.generateToken(user.getUsername(), user.getId()));
+        String token = JwtUtils.generateToken(user.getUsername(), user.getId());
+        // TODO: 加上过期时间，未知的idea的bug导致无法导入TimeUnit
+        redisTemplate.opsForValue().set("user:"+user.getId(),token);
+        return CommonResponse.success(token);
     }
 
     @Override
@@ -116,6 +116,14 @@ public class UserServiceImpl implements UserService {
             userDtos.add(userDto);
         }
         return CommonResponse.success(userDtos);
+
+    }
+
+    @Override
+    public CommonResponse logout(String token) {
+
+        redisTemplate.delete("user:"+JwtUtils.getId(token));
+        return CommonResponse.success(null);
 
     }
 

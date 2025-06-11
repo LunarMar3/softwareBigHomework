@@ -32,4 +32,9 @@ public class UserController {
     public CommonResponse getUsers(@RequestParam String departmentId,@RequestParam Integer index) {
         return userService.getUsers(index,departmentId);
     }
+
+    @PostMapping("/logout")
+    public CommonResponse logout(@RequestHeader("token") String token) {
+        return userService.logout(token);
+    }
 }
