@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -89,6 +90,27 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
 
 
+    }
+
+    @Override
+    public CommonResponse getWorkOrderById(String token, Integer workOrderId) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderId);
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
+        return CommonResponse.success(workOrder);
+    }
+
+    @Override
+    public CommonResponse closeWorkOrder(String token, WorkOrderDto workOrderDto) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        workOrder.setStatus("已关闭");
+        workOrderMapper.updateById(workOrder);
+        return CommonResponse.success("工单已关闭");
     }
 }
 

@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResponse getUsers(Integer index,String departmentId) {
+    public CommonResponse getUsers(Integer index,Integer departmentId) {
         Page<User> page = new Page<>(index, 10);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("department_id", departmentId);

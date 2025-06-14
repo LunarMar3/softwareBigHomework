@@ -22,8 +22,18 @@ public class WorkOrderController {
         return workOrderService.createWorkOrder(token,workOrderDto);
     }
 
+    @GetMapping("/getWorkOrderById")
+    public CommonResponse getWorkOrderById(@RequestHeader("token") String token, @RequestParam("workOrderId") Integer workOrderId) {
+        return workOrderService.getWorkOrderById(token, workOrderId);
+    }
+
     @PostMapping("/updateWorkOrder")
     public CommonResponse updateWorkOrder(@RequestHeader("token") String token,@RequestBody WorkOrderDto workOrderDto) {
         return workOrderService.updateWorkOrder(token,workOrderDto);
+    }
+
+    @PostMapping("/close")
+    public CommonResponse closeWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.closeWorkOrder(token, workOrderDto);
     }
 }

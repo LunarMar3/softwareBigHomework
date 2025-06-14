@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/getUsersByDepartmentId")
-    public CommonResponse getUsers(@RequestParam String departmentId,@RequestParam Integer index) {
+    public CommonResponse getUsers(@RequestParam Integer departmentId,@RequestParam Integer index) {
         return userService.getUsers(index,departmentId);
     }
 
