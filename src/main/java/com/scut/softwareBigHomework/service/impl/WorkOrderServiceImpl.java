@@ -30,16 +30,17 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private WorkOrderMapper workOrderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private EmailUtils emailUtils;
 
     @Override
     public CommonResponse getAllWorkOrders(String token,int index) {
-        Jws<Claims> claimsJws = JwtUtils.parseToken(token);
-        Claims claims = claimsJws.getBody();
-        String id = claims.get("id",String.class);
+        String id = JwtUtils.getId(token);
         QueryWrapper<WorkOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("assignee_id",id);
+        queryWrapper.or().eq("requester_id",id);
 
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.orderByDesc("updated_at");
         Page<WorkOrder> page = new Page<>(index, 10);
         Page<WorkOrder> workOrderPage = workOrderMapper.selectPage(page, queryWrapper);
         List<WorkOrder> workOrders = workOrderPage.getRecords();
@@ -63,7 +64,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         User user = userMapper.selectOne(queryWrapper);
         Thread.ofVirtual().start(() -> {
             try {
-                EmailUtils.sendEmail(user.getEmail(), "新工单", "你有来自id为" + id + "的新工单");
+                emailUtils.sendEmail(user.getEmail(), "新工单", "你有来自id为" + id + "的新工单");
             } catch (Exception e) {
                 log.error("邮件发送失败: " + e.getMessage());
             }

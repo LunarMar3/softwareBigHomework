@@ -34,7 +34,7 @@ public class WorkOrder {
     @TableField("assignee_id")
     int assigneeId;
 
-    @TableField("assignee_group_id")
+    @TableField("assigned_group_id")
     int assigneeGroupId;
 
     @TableField("created_at")

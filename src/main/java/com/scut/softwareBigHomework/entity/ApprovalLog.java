@@ -27,7 +27,7 @@ public class ApprovalLog {
 
     int status;
 
-    String comment;
+    String comments;
 
     @TableField("created_at")
     LocalDateTime createdAt;

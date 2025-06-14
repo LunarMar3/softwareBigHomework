@@ -18,7 +18,7 @@ public class AttachmentController {
         return attachmentService.uploadAttachment(file,token,workOrderId);
     }
 
-    @GetMapping("/getAttachment")
+    @GetMapping("/getAttachments")
     public CommonResponse getAllAttachments(@RequestHeader("token") String token,@RequestParam("workOrderId") Integer workOrderId) {
         return attachmentService.getAllAttachments(token,workOrderId);
     }
