@@ -183,5 +183,25 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         );
         return CommonResponse.success("工单已拒绝");
     }
+
+    @Override
+    public CommonResponse completeWorkOrder(String token, WorkOrderDto workOrderDto) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
+        workOrder.setStatus("已完成预案");
+        workOrder.setSolution(workOrderDto.getSolution());
+        workOrder.setComment(workOrderDto.getComment());
+        workOrderMapper.updateById(workOrder);
+        emailUtils.sendEmail(
+                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                "工单完成通知",
+                "你的工单已完成预案，状态为：已完成，请等待上级审批是否通过该解决方案。"
+        );
+        return CommonResponse.success("工单已完成预案");
+    }
 }
 
