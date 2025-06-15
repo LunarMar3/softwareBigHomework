@@ -105,6 +105,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrderDto.getDescription() != null) {
             workOrder.setDescription(workOrderDto.getDescription());
         }
+        if (workOrderDto.getComment() != null) {
+            workOrder.setComment(workOrderDto.getComment());
+        }
         workOrder.setUpdatedAt(LocalDateTime.now());
         workOrderMapper.updateById(workOrder);
         return CommonResponse.success("工单已更新");
@@ -149,6 +152,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             return CommonResponse.fail("工单未提供解决方案，无法审批");
         }
         workOrder.setStatus("已审批");
+        workOrder.setComment(workOrderDto.getComment());
         workOrderMapper.updateById(workOrder);
         emailUtils.sendEmail(
                 userMapper.selectById(workOrder.getRequesterId()).getEmail(),
@@ -170,6 +174,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             return CommonResponse.fail("工单未完成，无法拒绝");
         }
         workOrder.setStatus("已拒绝");
+        workOrder.setComment(workOrderDto.getComment());
         workOrderMapper.updateById(workOrder);
         emailUtils.sendEmail(
                 userMapper.selectById(workOrder.getRequesterId()).getEmail(),

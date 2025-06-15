@@ -30,4 +30,6 @@ public class WorkOrderDto {
 
     String solution;
 
+    String comment;
+
 }

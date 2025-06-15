@@ -49,4 +49,6 @@ public class WorkOrder {
     LocalDateTime deadline;
 
     String solution;
+
+    String comment;
 }
