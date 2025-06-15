@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkOrderDto {
-    int id;
+    Integer id;
 
     String title;
 
@@ -18,14 +18,16 @@ public class WorkOrderDto {
 
     String status;
 
-    int priority;
+    Integer priority;
 
     String type;
 
     LocalDateTime deadline;
 
-    int departmentId;
+    Integer departmentId;
 
-    int assigneeId;
+    Integer assigneeId;
+
+    String solution;
 
 }

@@ -14,4 +14,8 @@ public interface WorkOrderService {
     CommonResponse getWorkOrderById(String token, Integer workOrderId);
 
     CommonResponse closeWorkOrder(String token, WorkOrderDto workOrderDto);
+
+    CommonResponse approveWorkOrder(String token, WorkOrderDto workOrderDto);
+
+    CommonResponse rejectWorkOrder(String token, WorkOrderDto workOrderDto);
 }

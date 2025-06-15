@@ -36,4 +36,16 @@ public class WorkOrderController {
     public CommonResponse closeWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
         return workOrderService.closeWorkOrder(token, workOrderDto);
     }
+
+    @PostMapping("/approve")
+    public CommonResponse approveWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.approveWorkOrder(token, workOrderDto);
+    }
+
+    @PostMapping("/reject")
+    public CommonResponse rejectWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.rejectWorkOrder(token, workOrderDto);
+    }
+
+
 }

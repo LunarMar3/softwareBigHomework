@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("work_orders")
 public class WorkOrder {
-    int id;
+    Integer id;
 
     String title;
 
@@ -21,21 +21,21 @@ public class WorkOrder {
 
     String status;
 
-    int priority;
+    Integer priority;
 
     String type;
 
     @TableField("requester_id")
-    int requesterId;
+    Integer requesterId;
 
     @TableField("department_id")
-    int departmentId;
+    Integer departmentId;
 
     @TableField("assignee_id")
-    int assigneeId;
+    Integer assigneeId;
 
     @TableField("assigned_group_id")
-    int assigneeGroupId;
+    Integer assigneeGroupId;
 
     @TableField("created_at")
     LocalDateTime createdAt;

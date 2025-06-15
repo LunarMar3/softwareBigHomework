@@ -80,16 +80,34 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         Integer id = Integer.valueOf(JwtUtils.getId(token));
         QueryWrapper<WorkOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id",workOrderDto.getId());
-        queryWrapper.eq("assignee_id",id);
         WorkOrder workOrder = workOrderMapper.selectOne(queryWrapper);
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        return null;
-
-
-
-
+        if (!workOrder.getAssigneeId().equals(id)) {
+            return CommonResponse.fail("你没有权限修改此工单");
+        }
+        if (workOrder.getStatus().equals("已关闭")) {
+            return CommonResponse.fail("工单已关闭，无法修改");
+        }
+        if (workOrder.getStatus().equals("已完成")) {
+            return CommonResponse.fail("工单已完成，无法修改");
+        }
+        if (workOrderDto.getStatus() != null) {
+            workOrder.setStatus(workOrderDto.getStatus());
+        }
+        if (workOrderDto.getPriority() != null) {
+            workOrder.setPriority(workOrderDto.getPriority());
+        }
+        if (workOrderDto.getDeadline() != null) {
+            workOrder.setDeadline(workOrderDto.getDeadline());
+        }
+        if (workOrderDto.getDescription() != null) {
+            workOrder.setDescription(workOrderDto.getDescription());
+        }
+        workOrder.setUpdatedAt(LocalDateTime.now());
+        workOrderMapper.updateById(workOrder);
+        return CommonResponse.success("工单已更新");
     }
 
     @Override
@@ -108,9 +126,57 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
         WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
         workOrder.setStatus("已关闭");
         workOrderMapper.updateById(workOrder);
         return CommonResponse.success("工单已关闭");
+    }
+
+    @Override
+    public CommonResponse approveWorkOrder(String token, WorkOrderDto workOrderDto) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
+        if (!workOrder.getStatus().equals("已完成")) {
+            return CommonResponse.fail("工单未完成，无法审批");
+        }
+        if (workOrder.getSolution() == null || workOrder.getSolution().isEmpty()) {
+            return CommonResponse.fail("工单未提供解决方案，无法审批");
+        }
+        workOrder.setStatus("已审批");
+        workOrderMapper.updateById(workOrder);
+        emailUtils.sendEmail(
+                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                "工单审批结果",
+                "你的工单已被审批，状态为：已审批"
+        );
+        return CommonResponse.success("工单已审批");
+    }
+
+    @Override
+    public CommonResponse rejectWorkOrder(String token, WorkOrderDto workOrderDto) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
+        if (!workOrder.getStatus().equals("已完成")) {
+            return CommonResponse.fail("工单未完成，无法拒绝");
+        }
+        workOrder.setStatus("已拒绝");
+        workOrderMapper.updateById(workOrder);
+        emailUtils.sendEmail(
+                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                "工单审批结果",
+                "你的工单已被拒绝，状态为：已拒绝，请联系相关人员处理"
+        );
+        return CommonResponse.success("工单已拒绝");
     }
 }
 
