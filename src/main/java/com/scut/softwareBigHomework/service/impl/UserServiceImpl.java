@@ -108,16 +108,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResponse getUsers(Integer index,Integer departmentId) {
-        Page<User> page = new Page<>(index, 10);
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("department_id", departmentId);
-        userMapper.selectPage(page, queryWrapper);
-        List<User> users = page.getRecords();
+    public CommonResponse getUsers(Integer departmentId) {
         List<UserDto> userDtos = new ArrayList<>();
+        List<User> users = userMapper.selectList(new QueryWrapper<User>().eq("department_id", departmentId));
         for (User user : users) {
             UserDto userDto = new UserDto();
             BeanUtils.copyProperties(user, userDto);
+            userDto.setId(user.getId());
+            userDto.setUsername(user.getUsername());
+            userDto.setRealName(user.getRealName());
+            userDto.setEmail(user.getEmail());
+            userDto.setPhone(user.getPhone());
+            userDto.setDepartmentId(user.getDepartmentId());
             userDtos.add(userDto);
         }
         return CommonResponse.success(userDtos);

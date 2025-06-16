@@ -8,6 +8,7 @@ import com.scut.softwareBigHomework.entity.ApprovalLog;
 import com.scut.softwareBigHomework.entity.User;
 import com.scut.softwareBigHomework.entity.WorkOrder;
 import com.scut.softwareBigHomework.entity.WorkOrderLog;
+import com.scut.softwareBigHomework.enums.StatusEnum;
 import com.scut.softwareBigHomework.mapper.ApprovalLogMapper;
 import com.scut.softwareBigHomework.mapper.UserMapper;
 import com.scut.softwareBigHomework.mapper.WorkOrderLogMapper;
@@ -59,15 +60,17 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     public CommonResponse createWorkOrder(String token, WorkOrderDto workOrderDto) {
 
         int id = Integer.parseInt(JwtUtils.getId(token));
+        User user = userMapper.selectById(id);
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderDto,workOrder);
         workOrder.setAssigneeId(id);
+        workOrder.setStatus("未处理");
         workOrder.setCreatedAt(LocalDateTime.now());
         workOrder.setUpdatedAt(LocalDateTime.now());
+        workOrder.setAssigneeId(user.getLeaderId());
         workOrderMapper.insert(workOrder);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getId,workOrderDto.getAssigneeId());
-        User user = userMapper.selectOne(queryWrapper);
         Thread.ofVirtual().start(() -> {
             try {
                 emailUtils.sendEmail(user.getEmail(), "新工单", "你有来自id为" + id + "的新工单");
@@ -284,6 +287,20 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderLog.setOperatorId(Integer.parseInt(JwtUtils.getId(token)));
         workOrderLogMapper.insert(workOrderLog);
         return CommonResponse.success("工单已指派给用户ID：" + workOrderDto.getAssigneeId());
+    }
+
+    @Override
+    public CommonResponse getAllWorkOrdersByStatus(String token, Integer status, int index) {
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getStatus, StatusEnum.getStatusString(status));
+        lambdaQueryWrapper.orderByDesc(WorkOrder::getUpdatedAt);
+        lambdaQueryWrapper.eq(WorkOrder::getAssigneeId, Integer.parseInt(JwtUtils.getId(token))).or()
+                .eq(WorkOrder::getRequesterId, Integer.parseInt(JwtUtils.getId(token)));
+        Page<WorkOrder> page = new Page<>(index, 10);
+        Page<WorkOrder> workOrderPage = workOrderMapper.selectPage(page, lambdaQueryWrapper);
+        List<WorkOrder> workOrders = workOrderPage.getRecords();
+        return CommonResponse.success(workOrders);
+
     }
 }
 

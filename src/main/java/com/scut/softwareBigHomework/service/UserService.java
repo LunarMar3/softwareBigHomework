@@ -10,7 +10,7 @@ public interface UserService {
 
     CommonResponse sms(UserDto userDto);
 
-    CommonResponse getUsers(Integer index ,Integer departmentId);
+    CommonResponse getUsers(Integer departmentId);
 
     CommonResponse logout(String token);
 

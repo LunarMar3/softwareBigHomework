@@ -29,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/getUsersByDepartmentId")
-    public CommonResponse getUsers(@RequestParam Integer departmentId,@RequestParam Integer index) {
-        return userService.getUsers(index,departmentId);
+    public CommonResponse getUsers(@RequestParam Integer departmentId) {
+        return userService.getUsers(departmentId);
     }
 
     @PostMapping("/logout")
