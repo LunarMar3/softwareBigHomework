@@ -74,7 +74,12 @@ public class UserServiceImpl implements UserService {
         redisTemplate.delete("code:" + userDto.getEmail());
 
         user = new User();
-        BeanUtils.copyProperties(userDto, user);
+        user.setPassword(userDto.getPassword());
+        user.setUsername(userDto.getUsername());
+        user.setEmail(userDto.getEmail());
+        user.setDepartmentId(userDto.getDepartmentId());
+        user.setPhone(userDto.getPhone());
+        user.setRealName(userDto.getRealName());
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
@@ -116,7 +121,6 @@ public class UserServiceImpl implements UserService {
             userDtos.add(userDto);
         }
         return CommonResponse.success(userDtos);
-
     }
 
     @Override
