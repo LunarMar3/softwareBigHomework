@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        if (!workOrder.getAssigneeId().equals(id)) {
+        if (!workOrder.getAssigneeId().equals(id) || !workOrder.getRequesterId().equals(id)) {
             return CommonResponse.fail("你没有权限修改此工单");
         }
         if (workOrder.getStatus().equals("已关闭")) {
@@ -167,8 +168,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        if (!workOrder.getStatus().equals("已完成")) {
-            return CommonResponse.fail("工单未完成，无法审批");
+        if (!workOrder.getStatus().equals("已完成预案")) {
+            return CommonResponse.fail("工单未完成预案，无法审批");
         }
         if (workOrder.getSolution() == null || workOrder.getSolution().isEmpty()) {
             return CommonResponse.fail("工单未提供解决方案，无法审批");
@@ -176,8 +177,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrder.setStatus("已审批");
         workOrder.setComment(workOrderDto.getComment());
         workOrderMapper.updateById(workOrder);
+        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
         emailUtils.sendEmail(
-                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单审批结果",
                 "你的工单已被审批，状态为：已审批"
         );
@@ -199,14 +202,16 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        if (!workOrder.getStatus().equals("已完成")) {
-            return CommonResponse.fail("工单未完成，无法拒绝");
+        if (!workOrder.getStatus().equals("已完成预案")) {
+            return CommonResponse.fail("工单未完成预案，无法拒绝");
         }
         workOrder.setStatus("已拒绝");
         workOrder.setComment(workOrderDto.getComment());
         workOrderMapper.updateById(workOrder);
+        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
         emailUtils.sendEmail(
-                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单审批结果",
                 "你的工单已被拒绝，状态为：已拒绝，请联系相关人员处理"
         );
@@ -232,8 +237,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrder.setSolution(workOrderDto.getSolution());
         workOrder.setComment(workOrderDto.getComment());
         workOrderMapper.updateById(workOrder);
+        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
         emailUtils.sendEmail(
-                userMapper.selectById(workOrder.getRequesterId()).getEmail(),
+                userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单完成通知",
                 "你的工单已完成预案，状态为：已完成，请等待上级审批是否通过该解决方案。"
         );
