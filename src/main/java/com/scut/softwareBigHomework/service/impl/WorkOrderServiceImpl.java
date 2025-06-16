@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scut.softwareBigHomework.dto.WorkOrderDto;
+import com.scut.softwareBigHomework.entity.ApprovalLog;
 import com.scut.softwareBigHomework.entity.User;
 import com.scut.softwareBigHomework.entity.WorkOrder;
 import com.scut.softwareBigHomework.entity.WorkOrderLog;
@@ -15,14 +16,10 @@ import com.scut.softwareBigHomework.service.WorkOrderService;
 import com.scut.softwareBigHomework.utils.CommonResponse;
 import com.scut.softwareBigHomework.utils.EmailUtils;
 import com.scut.softwareBigHomework.utils.JwtUtils;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -122,6 +119,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
         workOrder.setUpdatedAt(LocalDateTime.now());
         workOrderMapper.updateById(workOrder);
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setAction("修改工单");
+        workOrderLog.setCreatedAt(LocalDateTime.now());
+        workOrderLog.setOperatorId(id);
+        workOrderLogMapper.insert(workOrderLog);
+
         return CommonResponse.success("工单已更新");
     }
 
@@ -146,6 +150,12 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
         workOrder.setStatus("已关闭");
         workOrderMapper.updateById(workOrder);
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setAction("关闭工单");
+        workOrderLog.setCreatedAt(LocalDateTime.now());
+        workOrderLog.setOperatorId(Integer.valueOf(JwtUtils.getId(token)));
+        workOrderLogMapper.insert(workOrderLog);
         return CommonResponse.success("工单已关闭");
     }
 
@@ -171,6 +181,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 "工单审批结果",
                 "你的工单已被审批，状态为：已审批"
         );
+        ApprovalLog approvalLog = new ApprovalLog();
+        approvalLog.setWorkOrderId(workOrder.getId());
+        approvalLog.setApproverId(Integer.valueOf(JwtUtils.getId(token)));
+        approvalLog.setCreatedAt(LocalDateTime.now());
+        approvalLog.setStatus(1);
+        approvalLog.setComments(workOrderDto.getComment());
+        approvalLogMapper.insert(approvalLog);
         return CommonResponse.success("工单已审批");
     }
 
@@ -193,6 +210,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 "工单审批结果",
                 "你的工单已被拒绝，状态为：已拒绝，请联系相关人员处理"
         );
+        ApprovalLog approvalLog = new ApprovalLog();
+        approvalLog.setWorkOrderId(workOrder.getId());
+        approvalLog.setApproverId(Integer.valueOf(JwtUtils.getId(token)));
+        approvalLog.setCreatedAt(LocalDateTime.now());
+        approvalLog.setStatus(0);
+        approvalLog.setComments(workOrderDto.getComment());
+        approvalLogMapper.insert(approvalLog);
         return CommonResponse.success("工单已拒绝");
     }
 
@@ -213,6 +237,12 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 "工单完成通知",
                 "你的工单已完成预案，状态为：已完成，请等待上级审批是否通过该解决方案。"
         );
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setAction("工单完成预案");
+        workOrderLog.setCreatedAt(LocalDateTime.now());
+        workOrderLog.setOperatorId(Integer.valueOf(JwtUtils.getId(token)));
+        workOrderLogMapper.insert(workOrderLog);
         return CommonResponse.success("工单已完成预案");
     }
 }
