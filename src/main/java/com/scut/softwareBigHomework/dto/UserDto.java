@@ -15,5 +15,6 @@ public class UserDto {
     private String phone;
     private String realName;
     private int departmentId;
+    private int leaderId;
     private String code;
 }

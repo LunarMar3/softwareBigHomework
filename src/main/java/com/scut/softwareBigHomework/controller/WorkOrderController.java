@@ -52,5 +52,9 @@ public class WorkOrderController {
         return workOrderService.completeWorkOrder(token, workOrderDto);
     }
 
+    @PostMapping("/assign")
+    public CommonResponse assignWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.assignWorkOrder(token, workOrderDto);
+    }
 
 }

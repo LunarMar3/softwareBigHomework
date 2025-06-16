@@ -39,6 +39,8 @@ public class User {
 
     String role;
 
+    Integer leaderId;
+
     @TableField("is_active")
     boolean isActive;
 

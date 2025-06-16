@@ -20,4 +20,6 @@ public interface WorkOrderService {
     CommonResponse rejectWorkOrder(String token, WorkOrderDto workOrderDto);
 
     CommonResponse completeWorkOrder(String token, WorkOrderDto workOrderDto);
+
+    CommonResponse assignWorkOrder(String token, WorkOrderDto workOrderDto);
 }
