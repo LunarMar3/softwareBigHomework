@@ -120,6 +120,7 @@ public class UserServiceImpl implements UserService {
             userDto.setEmail(user.getEmail());
             userDto.setPhone(user.getPhone());
             userDto.setDepartmentId(user.getDepartmentId());
+            userDto.setLeaderId(user.getLeaderId());
             userDtos.add(userDto);
         }
         return CommonResponse.success(userDtos);
