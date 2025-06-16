@@ -131,4 +131,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public CommonResponse updateDepartmentId(String token, UserDto userDto) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        String id = JwtUtils.getId(token);
+        queryWrapper.eq("id", id);
+        User user = userMapper.selectOne(queryWrapper);
+        user.setDepartmentId(userDto.getDepartmentId());
+        userMapper.updateById(user);
+        return CommonResponse.success(null);
+    }
+
 }

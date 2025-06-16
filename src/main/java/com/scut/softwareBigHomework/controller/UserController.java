@@ -37,4 +37,9 @@ public class UserController {
     public CommonResponse logout(@RequestHeader("token") String token) {
         return userService.logout(token);
     }
+
+    @PostMapping("/updateDepartmentId")
+    public CommonResponse updateDepartmentId(@RequestHeader("token") String token,@RequestBody UserDto userDto) {
+        return userService.updateDepartmentId(token,userDto);
+    }
 }

@@ -13,4 +13,6 @@ public interface UserService {
     CommonResponse getUsers(Integer index ,Integer departmentId);
 
     CommonResponse logout(String token);
+
+    CommonResponse updateDepartmentId(String token,UserDto userDto);
 }

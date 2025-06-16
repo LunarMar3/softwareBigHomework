@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scut.softwareBigHomework.dto.WorkOrderDto;
 import com.scut.softwareBigHomework.entity.User;
 import com.scut.softwareBigHomework.entity.WorkOrder;
+import com.scut.softwareBigHomework.entity.WorkOrderLog;
+import com.scut.softwareBigHomework.mapper.ApprovalLogMapper;
 import com.scut.softwareBigHomework.mapper.UserMapper;
+import com.scut.softwareBigHomework.mapper.WorkOrderLogMapper;
 import com.scut.softwareBigHomework.mapper.WorkOrderMapper;
 import com.scut.softwareBigHomework.service.WorkOrderService;
 import com.scut.softwareBigHomework.utils.CommonResponse;
@@ -31,6 +34,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private WorkOrderMapper workOrderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private ApprovalLogMapper approvalLogMapper;
+    @Autowired
+    private WorkOrderLogMapper workOrderLogMapper;
     @Autowired
     private EmailUtils emailUtils;
 
@@ -71,6 +78,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             }
         });
 
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setAction("创建工单");
+        workOrderLog.setCreatedAt(LocalDateTime.now());
+        workOrderLog.setOperatorId(id);
         return CommonResponse.success(null);
 
     }
