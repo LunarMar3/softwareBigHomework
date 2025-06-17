@@ -20,7 +20,7 @@ public class ApprovalLogServiceImpl implements ApprovalLogService {
     public CommonResponse getAllApprovalLog(Integer index) {
         Page<ApprovalLog> page = new Page<>(index, 10);
         QueryWrapper<ApprovalLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("create_at");
+        queryWrapper.orderByDesc("created_at");
         Page<ApprovalLog> approvalLogPage = approvalLogMapper.selectPage(page, queryWrapper);
         return CommonResponse.success(approvalLogPage);
     }
