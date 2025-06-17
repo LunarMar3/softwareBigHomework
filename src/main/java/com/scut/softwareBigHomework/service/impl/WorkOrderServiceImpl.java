@@ -168,35 +168,59 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     @Override
     public CommonResponse approveWorkOrder(String token, WorkOrderDto workOrderDto) {
+        User user = userMapper.selectById(Integer.parseInt(JwtUtils.getId(token)));
         LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
         WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        if (!workOrder.getStatus().equals("已完成预案")) {
-            return CommonResponse.fail("工单未完成预案，无法审批");
-        }
         if (workOrder.getSolution() == null || workOrder.getSolution().isEmpty()) {
             return CommonResponse.fail("工单未提供解决方案，无法审批");
         }
-        workOrder.setStatus("已审批");
-        workOrder.setComment(workOrderDto.getComment());
-        workOrderMapper.updateById(workOrder);
-        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
-        userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
-        emailUtils.sendEmail(
-                userMapper.selectOne(userQueryWrapper).getEmail(),
-                "工单审批结果",
-                "你的工单已被审批，状态为：已审批"
-        );
-        ApprovalLog approvalLog = new ApprovalLog();
-        approvalLog.setWorkOrderId(workOrder.getId());
-        approvalLog.setApproverId(Integer.parseInt(JwtUtils.getId(token)));
-        approvalLog.setCreatedAt(LocalDateTime.now());
-        approvalLog.setStatus(1);
-        approvalLog.setComments(workOrderDto.getComment());
-        approvalLogMapper.insert(approvalLog);
+        if (workOrder.getStatus().equals("已关闭")) {
+            return CommonResponse.fail("工单已关闭，无法审批");
+        }
+
+        if (user.getLeaderId()!=null) {
+            workOrder.setStatus("审批中");
+            workOrder.setComment(workOrderDto.getComment());
+            workOrder.setAssigneeId(user.getLeaderId());
+            workOrderMapper.updateById(workOrder);
+            LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+            userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
+            emailUtils.sendEmail(
+                    userMapper.selectOne(userQueryWrapper).getEmail(),
+                    "工单审批结果",
+                    "你的工单已被审批，请等待下一步审批"
+            );
+            ApprovalLog approvalLog = new ApprovalLog();
+            approvalLog.setWorkOrderId(workOrder.getId());
+            approvalLog.setApproverId(Integer.parseInt(JwtUtils.getId(token)));
+            approvalLog.setCreatedAt(LocalDateTime.now());
+            approvalLog.setStatus(1);
+            approvalLog.setComments(workOrderDto.getComment());
+            approvalLogMapper.insert(approvalLog);
+        }else {
+            workOrder.setStatus("已审批");
+            workOrder.setComment(workOrderDto.getComment());
+            workOrder.setAssigneeId(workOrderDto.getOperatorId());
+            workOrderMapper.updateById(workOrder);
+            LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+            userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
+            emailUtils.sendEmail(
+                    userMapper.selectOne(userQueryWrapper).getEmail(),
+                    "工单审批结果",
+                    "你的工单已审批完成，请等待操作人员处理"
+            );
+            ApprovalLog approvalLog = new ApprovalLog();
+            approvalLog.setWorkOrderId(workOrder.getId());
+            approvalLog.setApproverId(Integer.parseInt(JwtUtils.getId(token)));
+            approvalLog.setCreatedAt(LocalDateTime.now());
+            approvalLog.setStatus(1);
+            approvalLog.setComments(workOrderDto.getComment());
+            approvalLogMapper.insert(approvalLog);
+        }
         return CommonResponse.success("工单已审批");
     }
 
@@ -208,7 +232,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        if (!workOrder.getStatus().equals("已完成预案")) {
+        if (!workOrder.getStatus().equals("审批中")) {
             return CommonResponse.fail("工单未完成预案，无法拒绝");
         }
         workOrder.setStatus("已拒绝");
@@ -219,7 +243,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         emailUtils.sendEmail(
                 userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单审批结果",
-                "你的工单已被拒绝，状态为：已拒绝，请联系相关人员处理"
+                "你的工单已被拒绝，请联系相关人员处理"
         );
         ApprovalLog approvalLog = new ApprovalLog();
         approvalLog.setWorkOrderId(workOrder.getId());
@@ -240,7 +264,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
         }
-        workOrder.setStatus("已完成预案");
+        workOrder.setStatus("审批中");
         workOrder.setSolution(workOrderDto.getSolution());
         workOrder.setComment(workOrderDto.getComment());
         workOrder.setAssigneeId(user.getLeaderId());
@@ -250,7 +274,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         emailUtils.sendEmail(
                 userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单完成通知",
-                "你的工单已完成预案，状态为：已完成，请等待流转。"
+                "你的工单已完成预案，状态为：审批中，请等待流转。"
         );
         WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setWorkOrderId(workOrder.getId());
@@ -258,7 +282,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderLog.setCreatedAt(LocalDateTime.now());
         workOrderLog.setOperatorId(Integer.parseInt(JwtUtils.getId(token)));
         workOrderLogMapper.insert(workOrderLog);
-        return CommonResponse.success("工单已完成预案");
+        return CommonResponse.success("工单已完成预案，审批中");
     }
 
     @Override
@@ -307,6 +331,36 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         lambdaQueryWrapper.last("limit " + offset + ", 10");
 
         return CommonResponse.success(workOrderMapper.selectList(lambdaQueryWrapper));
+    }
+
+    @Override
+    public CommonResponse finishWorkOrder(String token, WorkOrderDto workOrderDto) {
+        Integer userId = Integer.parseInt(JwtUtils.getId(token));
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
+        WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
+        if (workOrder == null) {
+            return CommonResponse.fail("工单不存在");
+        }
+        if (!workOrder.getAssigneeId().equals(userId)) {
+            return CommonResponse.fail("工单不属于你，无法完成");
+        }
+        workOrder.setStatus("已完成");
+        workOrder.setUpdatedAt(LocalDateTime.now());
+        workOrderMapper.updateById(workOrder);
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setAction("完成工单");
+        workOrderLog.setCreatedAt(LocalDateTime.now());
+        workOrderLog.setOperatorId(userId);
+        workOrderLogMapper.insert(workOrderLog);
+        emailUtils.sendEmail(
+                userMapper.selectById(workOrderDto.getAssigneeId()).getEmail(),
+                "工单完成通知",
+                "你的id为" + workOrder.getId() + "的工单已完成"
+        );
+
+        return CommonResponse.success("工单已完成");
     }
 }
 

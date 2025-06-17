@@ -32,4 +32,6 @@ public class WorkOrderDto {
 
     String comment;
 
+    Integer operatorId;
+
 }

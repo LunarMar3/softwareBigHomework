@@ -62,4 +62,9 @@ public class WorkOrderController {
         return workOrderService.getAllWorkOrdersByStatus(token, status, index);
     }
 
+    @PostMapping("/finish")
+    public CommonResponse finishWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
+        return workOrderService.finishWorkOrder(token, workOrderDto);
+    }
+
 }
