@@ -1,7 +1,9 @@
 package com.scut.softwareBigHomework.entity;
 
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("approval_logs")
 public class ApprovalLog {
+    @TableId(type = IdType.AUTO)
     int id;
 
     @TableField("work_order_id")

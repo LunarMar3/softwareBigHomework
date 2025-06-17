@@ -1,6 +1,8 @@
 package com.scut.softwareBigHomework.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @TableName("work_orders")
 public class WorkOrder {
+    @TableId(type = IdType.AUTO)
     Integer id;
 
     String title;

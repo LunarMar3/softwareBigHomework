@@ -69,6 +69,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrder.setStatus("未处理");
         workOrder.setCreatedAt(LocalDateTime.now());
         workOrder.setUpdatedAt(LocalDateTime.now());
+        workOrder.setRequesterId(id);
         workOrder.setAssigneeId(user.getLeaderId());
         workOrderMapper.insert(workOrder);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
