@@ -8,6 +8,7 @@ public class StatusEnum {
     public static final String STATUS_REJECTED = "已拒绝";
     public static final String STATUS_APPROVED = "已审批";
     public static final String STATUS_FINISHED = "已完成";
+    public static final String STATUS_ASSIGNED = "已指派";
 
     public static String getStatusString(Integer index){
         return switch (index) {
@@ -18,6 +19,7 @@ public class StatusEnum {
             case 4 -> STATUS_REJECTED;
             case 5 -> STATUS_APPROVED;
             case 6 -> STATUS_FINISHED;
+            case 7 -> STATUS_ASSIGNED;
             default -> "未知状态";
         };
     }

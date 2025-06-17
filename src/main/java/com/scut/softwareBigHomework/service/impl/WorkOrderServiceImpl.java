@@ -299,6 +299,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (workOrder.getStatus().equals("已关闭") || workOrder.getStatus().equals("已完成")) {
             return CommonResponse.fail("工单已关闭或已完成，无法指派");
         }
+        workOrder.setStatus("已指派");
         workOrder.setAssigneeId(workOrderDto.getAssigneeId());
         workOrder.setUpdatedAt(LocalDateTime.now());
         workOrderMapper.updateById(workOrder);
@@ -335,7 +336,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     @Override
     public CommonResponse finishWorkOrder(String token, WorkOrderDto workOrderDto) {
-        Integer userId = Integer.parseInt(JwtUtils.getId(token));
+        int userId = Integer.parseInt(JwtUtils.getId(token));
         LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WorkOrder::getId, workOrderDto.getId());
         WorkOrder workOrder = workOrderMapper.selectOne(lambdaQueryWrapper);
@@ -354,10 +355,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderLog.setCreatedAt(LocalDateTime.now());
         workOrderLog.setOperatorId(userId);
         workOrderLogMapper.insert(workOrderLog);
+
+        LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
+        userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
         emailUtils.sendEmail(
-                userMapper.selectById(workOrderDto.getAssigneeId()).getEmail(),
-                "工单完成通知",
-                "你的id为" + workOrder.getId() + "的工单已完成"
+                userMapper.selectOne(userQueryWrapper).getEmail(),
+                "工单处理结果",
+                "你id为" + userId + "的工单已完成，请查看详情。"
         );
 
         return CommonResponse.success("工单已完成");
