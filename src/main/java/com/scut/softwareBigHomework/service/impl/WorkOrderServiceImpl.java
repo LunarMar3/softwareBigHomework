@@ -41,19 +41,21 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private EmailUtils emailUtils;
 
     @Override
-    public CommonResponse getAllWorkOrders(String token,int index) {
-        String id = JwtUtils.getId(token);
-        QueryWrapper<WorkOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("assignee_id",id);
-        queryWrapper.or().eq("requester_id",id);
+    public CommonResponse getAllWorkOrders(String token, int index) {
+        Integer userId = Integer.parseInt(JwtUtils.getId(token));
+        LambdaQueryWrapper<WorkOrder> queryWrapper = new LambdaQueryWrapper<>();
+        // 使用Lambda表达式，更清晰的OR条件组合
+        queryWrapper.and(wrapper ->
+                wrapper.eq(WorkOrder::getAssigneeId, userId)
+                        .or()
+                        .eq(WorkOrder::getRequesterId, userId)
+        );
+        queryWrapper.orderByDesc(WorkOrder::getUpdatedAt);
+        int offset = (index - 1) * 10;
+        queryWrapper.last("limit " + offset + ", 10");
 
-        queryWrapper.orderByDesc("updated_at");
-        Page<WorkOrder> page = new Page<>(index, 10);
-        Page<WorkOrder> workOrderPage = workOrderMapper.selectPage(page, queryWrapper);
-        List<WorkOrder> workOrders = workOrderPage.getRecords();
 
-        return CommonResponse.success(workOrders);
-
+        return CommonResponse.success(workOrderMapper.selectList(queryWrapper));
     }
 
     @Override
@@ -62,7 +64,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         int id = Integer.parseInt(JwtUtils.getId(token));
         User user = userMapper.selectById(id);
         WorkOrder workOrder = new WorkOrder();
-        BeanUtils.copyProperties(workOrderDto,workOrder);
+        BeanUtils.copyProperties(workOrderDto, workOrder);
         workOrder.setAssigneeId(id);
         workOrder.setStatus("未处理");
         workOrder.setCreatedAt(LocalDateTime.now());
@@ -70,7 +72,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrder.setAssigneeId(user.getLeaderId());
         workOrderMapper.insert(workOrder);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(User::getId,workOrderDto.getAssigneeId());
+        queryWrapper.eq(User::getId, workOrderDto.getAssigneeId());
         Thread.ofVirtual().start(() -> {
             try {
                 emailUtils.sendEmail(user.getEmail(), "新工单", "你有来自id为" + id + "的新工单");
@@ -92,7 +94,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     public CommonResponse updateWorkOrder(String token, WorkOrderDto workOrderDto) {
         Integer id = Integer.valueOf(JwtUtils.getId(token));
         QueryWrapper<WorkOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id",workOrderDto.getId());
+        queryWrapper.eq("id", workOrderDto.getId());
         WorkOrder workOrder = workOrderMapper.selectOne(queryWrapper);
         if (workOrder == null) {
             return CommonResponse.fail("工单不存在");
@@ -291,16 +293,19 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     @Override
     public CommonResponse getAllWorkOrdersByStatus(String token, Integer status, int index) {
+        Integer userId = Integer.parseInt(JwtUtils.getId(token));
         LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WorkOrder::getStatus, StatusEnum.getStatusString(status));
+        lambdaQueryWrapper.and(wrapper ->
+                wrapper.eq(WorkOrder::getAssigneeId, userId)
+                        .or()
+                        .eq(WorkOrder::getRequesterId, userId)
+        );
         lambdaQueryWrapper.orderByDesc(WorkOrder::getUpdatedAt);
-        lambdaQueryWrapper.eq(WorkOrder::getAssigneeId, Integer.parseInt(JwtUtils.getId(token))).or()
-                .eq(WorkOrder::getRequesterId, Integer.parseInt(JwtUtils.getId(token)));
-        Page<WorkOrder> page = new Page<>(index, 10);
-        Page<WorkOrder> workOrderPage = workOrderMapper.selectPage(page, lambdaQueryWrapper);
-        List<WorkOrder> workOrders = workOrderPage.getRecords();
-        return CommonResponse.success(workOrders);
+        int offset = (index - 1) * 10;
+        lambdaQueryWrapper.last("limit " + offset + ", 10");
 
+        return CommonResponse.success(workOrderMapper.selectList(lambdaQueryWrapper));
     }
 }
 

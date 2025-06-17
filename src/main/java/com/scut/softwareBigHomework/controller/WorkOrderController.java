@@ -57,7 +57,7 @@ public class WorkOrderController {
         return workOrderService.assignWorkOrder(token, workOrderDto);
     }
 
-    @PostMapping("/getAllByStatus")
+    @GetMapping("/getAllByStatus")
     public CommonResponse getAllWorkOrdersByStatus(@RequestHeader("token") String token, @RequestParam("status") Integer status, @RequestParam("index") int index) {
         return workOrderService.getAllWorkOrdersByStatus(token, status, index);
     }
