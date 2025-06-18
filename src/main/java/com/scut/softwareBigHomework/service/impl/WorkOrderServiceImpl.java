@@ -76,7 +76,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         queryWrapper.eq(User::getId, workOrderDto.getAssigneeId());
         Thread.ofVirtual().start(() -> {
             try {
-                emailUtils.sendEmail(user.getEmail(), "新工单", "你有来自id为" + id + "的新工单");
+                emailUtils.sendEmail(userMapper.selectOne(queryWrapper).getEmail(), "新工单", "你有来自id为" + id + "的新工单");
             } catch (Exception e) {
                 log.error("邮件发送失败: " + e.getMessage());
             }

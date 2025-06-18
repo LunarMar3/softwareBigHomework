@@ -18,10 +18,10 @@ public class ApprovalLogServiceImpl implements ApprovalLogService {
 
     @Override
     public CommonResponse getAllApprovalLog(Integer index) {
-        Page<ApprovalLog> page = new Page<>(index, 10);
         QueryWrapper<ApprovalLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("created_at");
-        Page<ApprovalLog> approvalLogPage = approvalLogMapper.selectPage(page, queryWrapper);
-        return CommonResponse.success(approvalLogPage);
+        int offset = (index - 1) * 10;
+        queryWrapper.last("limit " + offset + ", 10");
+        return CommonResponse.success(approvalLogMapper.selectList(queryWrapper));
     }
 }

@@ -18,4 +18,9 @@ public class DataController {
         return dataService.getTodayProcessWorkOrder();
     }
 
+    @GetMapping("/getDeadlineWorkOrder")
+    public CommonResponse getDeadlineWorkOrder() {
+        return dataService.getDeadlineWorkOrder();
+    }
+
 }

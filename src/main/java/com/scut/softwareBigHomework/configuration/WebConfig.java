@@ -18,15 +18,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/account/login", "/account/register","/account/logout","/account/sms");
     }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // 允许所有路径
-                .allowedOrigins("*") // 允许所有来源
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允许的HTTP方法
-                .allowedHeaders("*") // 允许的请求头
-                .allowCredentials(true) // 是否允许发送Cookie
-                .maxAge(3600); // 预检请求的缓存时间
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowCredentials(true)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .maxAge(3600);
     }
-
-
 }

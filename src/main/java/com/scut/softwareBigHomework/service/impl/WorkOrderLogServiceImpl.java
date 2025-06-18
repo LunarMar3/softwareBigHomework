@@ -20,10 +20,10 @@ public class WorkOrderLogServiceImpl implements WorkOrderLogService {
 
     @Override
     public CommonResponse getAllWorkOrderLogs(Integer index) {
-        Page<WorkOrderLog> page = new Page<>(index, 10);
         QueryWrapper<WorkOrderLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("created_at");
-        Page<WorkOrderLog> workOrderLogPage = workOrderLogMapper.selectPage(page, null);
-        return CommonResponse.success(workOrderLogPage);
+        int offset = (index - 1) * 10;
+        queryWrapper.last("limit " + offset + ", 10");
+        return CommonResponse.success(workOrderLogMapper.selectList(queryWrapper));
     }
 }
