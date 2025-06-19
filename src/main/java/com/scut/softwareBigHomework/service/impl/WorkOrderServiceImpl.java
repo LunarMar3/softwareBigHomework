@@ -303,8 +303,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrder.setAssigneeId(workOrderDto.getAssigneeId());
         workOrder.setUpdatedAt(LocalDateTime.now());
         workOrderMapper.updateById(workOrder);
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.eq("id", workOrderDto.getAssigneeId());
         emailUtils.sendEmail(
-                userMapper.selectById(workOrderDto.getAssigneeId()).getEmail(),
+                userMapper.selectOne(userQueryWrapper).getEmail(),
                 "工单指派通知",
                 "你已被指派处理工单，工单ID：" + workOrder.getId() + "，请尽快处理。"
         );
