@@ -207,7 +207,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             workOrder.setAssigneeId(workOrderDto.getOperatorId());
             workOrderMapper.updateById(workOrder);
             LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
-            userQueryWrapper.eq(User::getId, workOrder.getAssigneeId());
+            userQueryWrapper.eq(User::getId, workOrder.getRequesterId());
             emailUtils.sendEmail(
                     userMapper.selectOne(userQueryWrapper).getEmail(),
                     "工单审批结果",
@@ -322,11 +322,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         Integer userId = Integer.parseInt(JwtUtils.getId(token));
         LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(WorkOrder::getStatus, StatusEnum.getStatusString(status));
-        lambdaQueryWrapper.and(wrapper ->
-                wrapper.eq(WorkOrder::getAssigneeId, userId)
-                        .or()
-                        .eq(WorkOrder::getRequesterId, userId)
-        );
+        lambdaQueryWrapper.eq(WorkOrder::getAssigneeId,userId);
         lambdaQueryWrapper.orderByDesc(WorkOrder::getUpdatedAt);
         int offset = (index - 1) * 10;
         lambdaQueryWrapper.last("limit " + offset + ", 10");
