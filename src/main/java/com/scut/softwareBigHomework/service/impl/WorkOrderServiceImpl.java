@@ -364,5 +364,22 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         return CommonResponse.success("工单已完成");
     }
+
+    @Override
+    public CommonResponse getAllWorkOrdersByStatusIncludeSelf(String token, Integer status, int index) {
+        Integer userId = Integer.parseInt(JwtUtils.getId(token));
+        LambdaQueryWrapper<WorkOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(WorkOrder::getStatus, StatusEnum.getStatusString(status));
+        lambdaQueryWrapper.and(wrapper ->
+                wrapper.eq(WorkOrder::getAssigneeId, userId)
+                        .or()
+                        .eq(WorkOrder::getRequesterId, userId)
+        );
+        lambdaQueryWrapper.orderByDesc(WorkOrder::getUpdatedAt);
+        int offset = (index - 1) * 10;
+        lambdaQueryWrapper.last("limit " + offset + ", 10");
+
+        return CommonResponse.success(workOrderMapper.selectList(lambdaQueryWrapper));
+    }
 }
 

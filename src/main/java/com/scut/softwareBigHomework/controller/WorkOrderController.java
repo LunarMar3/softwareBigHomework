@@ -62,6 +62,11 @@ public class WorkOrderController {
         return workOrderService.getAllWorkOrdersByStatus(token, status, index);
     }
 
+    @GetMapping("/getAllByStatusIncludeSelf")
+    public CommonResponse getAllWorkOrdersByStatusIncludeSelf(@RequestHeader("token") String token, @RequestParam("status") Integer status, @RequestParam("index") int index) {
+        return workOrderService.getAllWorkOrdersByStatusIncludeSelf(token, status, index);
+    }
+
     @PostMapping("/finish")
     public CommonResponse finishWorkOrder(@RequestHeader("token") String token, @RequestBody WorkOrderDto workOrderDto) {
         return workOrderService.finishWorkOrder(token, workOrderDto);

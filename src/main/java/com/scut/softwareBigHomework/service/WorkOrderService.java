@@ -26,4 +26,6 @@ public interface WorkOrderService {
     CommonResponse getAllWorkOrdersByStatus(String token, Integer status, int index);
 
     CommonResponse finishWorkOrder(String token, WorkOrderDto workOrderDto);
+
+    CommonResponse getAllWorkOrdersByStatusIncludeSelf(String token, Integer status, int index);
 }
